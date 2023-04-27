@@ -12,7 +12,6 @@ from scipy.io import loadmat
 
 
 import warnings
-# warnings.filterwarnings("error")
 
 import torch 
 import torch.nn as nn
@@ -61,18 +60,6 @@ class Loader(Dataset):
         if self.mode == 'train' or self.mode == 'val':
             self.k_fold_split()
 
-        # self.return_keys = {
-        #     'label',
-        #     'ema_norm',
-        #     'emaLength',
-        #     'mfcc_norm',
-        #     'mfccLength',
-        #     'log_mel',
-        #     'melLength',
-        #     'fs',
-        #     'subject'
-        # }
-
         self.return_keys = {
             'label',
             'ema_norm',
@@ -109,64 +96,19 @@ class Loader(Dataset):
     
 
     def split_based_on_mode(self):
-        # final_files = []
         files = []
         for sub in self.curr_subs:
             # files = []
             data_loc = f"{self.tmp_dump}/{sub}"
             data_files = [f"{data_loc}/{file}" for file in sorted(os.listdir(data_loc))]
 
-            # q = int(len(data_files) / self.args.folds)
-            # total_n = int(q * self.args.folds)
-            # data_x = data_files[:total_n]
-            # splits = [
-            #     [idx, idx + int(len(data_x) / self.args.folds)] for idx in range(0, len(data_x), int(len(data_x) / self.args.folds))
-            # ]
-            # if self.fold == 0:
-            #     if mode == 'test':
-            #         files.extend(data_x[splits[self.fold][0]:splits[self.fold][1]])
-            #     else:
-            #         files.extend(data_x[splits[self.fold][1]:])
-            # elif self.fold in [1, 2, 3]:
-            #     if mode == 'test':
-            #         files.extend(data_x[splits[self.fold][0]:splits[self.fold][1]])
-            #     else:
-            #         files.extend(data_x[:splits[self.fold][0]])
-            #         files.extend(data_x[splits[self.fold][1]:])
-            # elif self.fold == 4:
-            #     if mode == 'test':
-            #         files.extend(data_x[splits[self.fold][0]:])
-            #     else:
-            #         files.extend(data_x[:splits[self.fold][0]])
-
-            # if mode == 'train':
-            #     final_files.extend(files[q:])
-            # elif mode == 'val':
-            #     final_files.extend(files[:q])
-            # elif mode == 'test':
-            #     final_files.extend(files)
-            # else:
-            #     raise NotImplementedError
-            
-
-            # random.shuffle(data_files)
             for idx, file in enumerate(data_files):
                 if (idx + 10) % 10 == 0:
                     if self.mode == 'test':
                         files.append(file)
-                # elif ((idx + 10 - 1) % 10) == 0:
-                #     if mode == 'val':
-                #         files.append(file)
-                # else:
-                #     if mode == 'train':
-                #         files.append(file)
                 else:
                     if self.mode == 'train' or self.mode == 'val':
                         files.append(file)
-
-        # available_files = {Path(f).stem:f for f in get_files(self.tmp_dump, '.pt')}
-        # self.files = [available_files[f] for f in files] 
-        # print(f"Total of {len(self.files)} files for {mode}-ing")
 
         self.files = files
         if self.mode == 'test':
@@ -221,7 +163,6 @@ class Loader(Dataset):
         if not os.path.exists(self.tmp_dump):
             os.mkdir(self.tmp_dump)
 
-        # if len(get_files(self.tmp_dump, '.pt')) == len(self.labels_list):
         if len(get_files(self.tmp_dump, '.pt')) != 0:
             print('All features have been generated and saved in the data/tmp folder.')
             return
@@ -301,86 +242,9 @@ class Loader(Dataset):
                         mfcc_temp = np.vstack((mfcc_temp, mfcc[start_index:end_index,:]))
                         BGEN.append((d.split()[0], d.split()[1]))
 
-            # # Make chunks after taking in all phonemes.
-            # if ema_temp.shape[0] > self.args.padMax:
-            #     s, end = 0, self.args.padMax
-            #     while end < ema_temp.shape[0]:
-            #         ema_final.append(ema_temp[s:end, :])
-            #         mfcc_final.append(mfcc_temp[s:end, :])
-            #         if ema_temp.shape[0] - end < self.args.padMax:
-            #             pad_zeroes_length = self.args.padMax - (ema_temp.shape[0] - end)
-            #             e = np.vstack(
-            #                 (ema_temp[end::], np.zeros((pad_zeroes_length, self.args.nEMA), dtype = float))
-            #             )
-            #             m = np.vstack(
-            #                 (mfcc_temp[end::], np.zeros((pad_zeroes_length, self.args.nMFCC), dtype = float))
-            #             )
-            #             ema_final.append(e)
-            #             mfcc_final.append(m)                 
-            #         s, end = end, end + self.args.padMax
-            # else:
-            #     ema_final.append(np.vstack(
-            #         (ema_temp, np.zeros((self.args.padMax - ema_temp.shape[0], self.args.nEMA), dtype = float))
-            #     ))
-            #     mfcc_final.append(np.vstack(
-            #         (mfcc_temp, np.zeros((self.args.padMax - mfcc_temp.shape[0], self.args.nMFCC), dtype = float))
-            #     ))
-
             ema_final, mfcc_final = ema_temp, mfcc_temp 
             return np.array(ema_final), np.array(mfcc_final), BGEN
 
-        def fetch_speech_features(label):
-            splits = label.split('/')
-            wav_path = f"{self.args.dataPath}/processed/{splits[11]}/{splits[12]}/wav_headMic/"
-            filename = splits[-1].split('.')[0]
-            wav, fs = librosa.load(wav_path + filename + '.wav', sr = self.args.wavsampleRate)
-            # fs, wav = wavfile.read(wav_path + filename + '.wav')
-            wav_temp = np.array([], dtype = np.float32).reshape(0, 1)
-
-            wav_final = []
-
-            with open(label) as f:
-                labels = f.readlines()
-                for d in labels:
-                    start_index = int(d.split()[0])
-                    end_index = int(d.split()[1])
-                    if d.split(' ')[2] != 'noi\n' and d.split(' ')[2] != 'sil\n':
-                        wav_temp = np.vstack((wav_temp, wav[start_index:end_index].reshape(-1,1)))
-
-            # # Make chunks after taking in all phonemes.
-
-            # if wav_temp.shape[0] > self.args.padMax:
-            #     s, end = 0, self.args.padMax * fs
-            #     while end < wav_temp.shape[0]:
-            #         wav_final.append(wav_temp[s:end])
-            #         if wav_temp.shape[0] - end < self.args.padMax:
-            #             pad_zeroes_length = self.args.padMax - (wav_temp.shape[0] - end)
-            #             w = np.vstack(
-            #                 (wav_temp[end::], np.zeros((pad_zeroes_length, 1), dtype = float))
-            #             )
-            #             wav_final.append(w)                   
-            #         s, end = end, end + (self.args.padMax) * fs
-            # else:
-            #     wav_final.append(np.vstack(
-            #         (wav_temp, np.zeros((self.args.padMax - wav_temp.shape[0], 1), dtype = float))
-            #     ))
-
-            # wav = torch.from_numpy(np.array(wav_final))
-            y = torch.from_numpy(np.array(wav_temp))
-            y = torch.clamp(y, min = -1, max = 1).numpy()
-
-            spec = np.abs(
-                librosa.stft(
-                    y, n_fft = self.args.nfft, hop_length = self.args.hopLength, win_length = self.args.winLength
-                )
-            )
-
-            mel = librosa.feature.melspectrogram(
-                S = spec, sr = self.args.wavsampleRate, n_fft = self.args.nfft, n_mels = self.args.nMels, fmin = self.args.fMin, fmax = self.args.fMax
-            ).T
-
-            return mel, np.log(np.clip(mel, a_min = 1e-5, a_max = None)), fs
-        
         def get_xvecs(label):
             splits = label.split('/')
             xvec_path = f"{self.args.dataPath}/processed/{splits[11]}/{splits[12]}/Xvector_Kaldi_headMic/"
@@ -392,25 +256,11 @@ class Loader(Dataset):
             ema = fetch_ema(label)
             mfcc = fetch_mfcc(label)
             ema_norm, mfcc_norm, BGEN = norm_mfcc_ema(mfcc, ema, label)
-            # mel, log_mel, fs = fetch_speech_features(label)
 
             if ema_norm.size != 0 and mfcc_norm.size != 0:
                 subject = label.split('/')[11]
                 save_name = f"{label.split('/')[12]}_{label.split('/')[-1].split('.')[0]}"
-
-                # data = {
-                #     'label': label,
-                #     'ema_norm': ema_norm,
-                #     'emaLength': ema_norm.shape[0],
-                #     'mfcc_norm': mfcc_norm,
-                #     'mfccLength': mfcc_norm.shape[0],
-                #     'mel': mel,
-                #     'log_mel': log_mel,
-                #     'melLength': log_mel.shape[0],
-                #     'fs': fs,
-                #     'subject': subject
-                # }
-
+                
                 data = {
                     'label': label,
                     'ema_norm': ema_norm,
