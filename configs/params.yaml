@@ -1,0 +1,58 @@
+params:
+  seed: 0
+  nMFCC: 39
+  nEMA: 24  # (12 + 6 + 6)
+  nxvec: 512
+  feats: ssl
+  folds: 5
+  model: BLSTM
+  trainSplit: 0.8
+  wavsampleRate: 16000
+  mfccsampleRate: 100
+  emasampleRate: 200
+  datasetName: TORGO
+  no_subs: 1 # all (for pooled), 1 for subject-specific & ft
+  sub: F04
+  ft_subjects: ['MC01', 'MC04', 'F03', 'F04']
+  dataPath: '/ifs/loni/faculty/shi/spectrum/Student_2020/kadidam/EE_638/data'
+  mode: train
+  noUnits: 256 #LSTM units
+  batchSize: 5
+  noEpoch: 50
+  std_frac: 0.25
+  inputDim: 39
+  earlyStop: True
+  fineTune: False
+  pooled: True
+  optimiser: adam
+  loss: mse
+  patience: 5
+  freq: 50
+  verbose: True
+  minRun: 0
+  delta: 0
+  lr: 1e-4
+  weightDecay: 1e-6
+  dump_feats: True
+  use_feats: True # if false, use mfcc
+  feats: 'apc' # audio_albert, pase_plus, tera, mockingjay, vq_wav2vec, wav2vec, 'apc', 'npc', decoar # specify SSL feat
+  ckpt: '/ifs/loni/faculty/shi/spectrum/Student_2020/kadidam/EE_638/ckpt'
+  infer: True
+  dump_cc: '/ifs/loni/faculty/shi/spectrum/Student_2020/kadidam/EE_638/results'
+  use_xvec: True
+  use_stats: False
+  x_vec_dim: 512
+  nfft: 2048
+  hopLength: 256
+  filterLength: 1024
+  winLength: 1024
+  nMels: 80
+  fMin: 0.0
+  fMax: 8000.0
+  normalizeMel: True
+  workers: 8
+  checkpoint_tag: ''
+  reuse: True
+  baseline: True
+  art_viz: ULx
+  ft_ckpt:
