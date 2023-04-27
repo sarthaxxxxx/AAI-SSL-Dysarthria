@@ -1,9 +1,5 @@
-import numpy as np
-
-
 import torch
-
-
+import numpy as np
 
 class CollateClass():
     def __init__(
@@ -35,11 +31,7 @@ class CollateClass():
 
         stats_dim = 2 * self.args.nMFCC if not self.ssl_feats else 2 * dim
         stats_padded = torch.FloatTensor(len(batch), max_ema_length, stats_dim)
-        # max_mel_len = max([x[5].shape[0] for x in batch])
-        # mel_padded = torch.FloatTensor(len(batch), max_mel_len, self.args.nMels)
-        # mel_padded.zero_()
 
-        # ema_lens_, mel_lens_, spks, labels = [], [] ,[], [], [], []
         ema_lens_, spks, labels = [], [] ,[]
 
         for idx in range(len(idx_sorted_decreasing)):
@@ -54,10 +46,6 @@ class CollateClass():
             mfcc = batch[idx_sorted_decreasing[idx]][3]
             mfcc_padded[idx, :mfcc.shape[0], :] = torch.from_numpy(mfcc)
             
-            # mel = batch(idx_sorted_decreasing[idx])[5]
-            # mel_padded[idx, :mel.shape[0], :] = torch.from_numpy(mel)
-            # mel_lens = batch(idx_sorted_decreasing[idx])[6]
-            # mel_lens_.append(mel_lens)
             xvec = batch[idx_sorted_decreasing[idx]][5]
             xvec_padded[idx, :, :] = torch.from_numpy(np.repeat(np.array(xvec)[np.newaxis, np.newaxis, :], max_ema_length, axis = 1))
 
@@ -99,8 +87,6 @@ class CollateClass():
             else:
                 return ema_padded, mfcc_padded, xvec_padded, t(ema_lens_), labels, spks
 
-
-            # return ema_padded, mfcc_padded, mel_padded, t(ema_lens_), t(mel_lens_), t(labels), t(spks)
 
 
 def t(arr):
