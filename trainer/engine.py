@@ -86,30 +86,7 @@ class Trainer():
                 else:
                     ema, mfcc, emb, ema_lens, labels, spks = data
                     ema, mfcc = ema.to(self.device), mfcc.to(self.device)
-                # ema, mfcc, ema_lens, labels, spks = self.set_device(
-                #     [ema, mfcc, ema_lens, labels, spks], ignoreList = []
-                # )
 
-                # ema, mfcc = ema.to(self.device), mfcc.to(self.device)
-
-                # if np.argwhere(ema_lens == 0) is not None:
-                #     self.skipped += 1
-                #     idx_to_skip = np.argwhere(ema_len == 0)[0][0].item()
-                #     ema = torch.cat((ema[:idx_to_skip], ema[idx_to_skip + 1:]), dim = 0)
-                #     mfcc = torch.cat((mfcc[:idx_to_skip], mfcc[idx_to_skip + 1:]), dim = 0)
-                #     ema_lens = torch.cat((ema_lens[:idx_to_skip], ema_lens[idx_to_skip + 1:]), dim = 0)
-                #     labels = torch.cat((labels[:idx_to_skip], labels[idx_to_skip + 1:]), dim = 0)
-                #     spks = torch.cat((spks[:idx_to_skip], spks[idx_to_skip + 1:]), dim = 0)
-
-                # if len(ema_lens) != len((ema_lens != 0).nonzero()):
-                #     self.skipped += 1
-                #     idx_to_skip = (ema_lens != 0).nonzero()
-                #     ema = ema[idx_to_skip]
-                #     mfcc = mfcc[idx_to_skip]
-                #     ema_lens = ema_lens[idx_to_skip]
-                #     labels = labels[idx_to_skip]
-                #     spks = spks[idx_to_skip]
-                    
                 if self.use_feats:
                     if self.use_xvecs or self.use_stats:
                         ema_pred = self.model(feats, emb.to(self.device))
@@ -158,13 +135,6 @@ class Trainer():
                             title = f'Patients - {self.args.art_viz} trajectory'
                             self.plot_trajectories(gt_articulatory, pred_articulatory, cc, title)
 
-                    # self.cc.extend(cc)
-                    # self.rmse.extend(rmse)
-
-                    # self.cc_hc.append(cc_hc)
-                    # self.cc_p.append(cc_p)
-                    # self.rmse_hc.append(rmse_hc)
-                    # self.rmse_p.append(rmse_p)
 
                     self.cc_hc.extend(cc_hc)
                     self.cc_p.extend(cc_p)
