@@ -1,3 +1,9 @@
+# checkpoints
+ckpt/
+
+# data
+data/
+
 # Byte-compiled / optimized / DLL files
 models/__pycache__/
 preprocess/__pycache__/
