@@ -6,10 +6,6 @@ params:
   feats: ssl
   folds: 5
   model: BLSTM
-  trainSplit: 0.8
-  wavsampleRate: 16000
-  mfccsampleRate: 100
-  emasampleRate: 200
   datasetName: TORGO
   no_subs: 1 # all (for pooled), 1 for subject-specific & ft
   sub: F04
@@ -42,17 +38,7 @@ params:
   use_xvec: True
   use_stats: False
   x_vec_dim: 512
-  nfft: 2048
-  hopLength: 256
-  filterLength: 1024
-  winLength: 1024
-  nMels: 80
-  fMin: 0.0
-  fMax: 8000.0
-  normalizeMel: True
   workers: 8
-  checkpoint_tag: ''
-  reuse: True
   baseline: True
   art_viz: ULx
   ft_ckpt:
