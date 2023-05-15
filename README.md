@@ -13,6 +13,8 @@ Set the parameters in config/params.yaml based on the mode of training/inference
 ```
 python3 runner.py --config (path to the config file in your system) --gpu "set your cuda device"
 ```
+## Final Paper
+[Link](https://drive.google.com/file/d/1kdc13hSqRVNf9fs6OLOnompAITzrVSpd/view?usp=sharing)
 
 ## Contact
   Sarthak Kumar Maharana - email: maharana@usc.edu 
